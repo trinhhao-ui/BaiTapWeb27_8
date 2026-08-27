@@ -1,0 +1,72 @@
+package Controller;
+
+import java.io.IOException;
+
+import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.MultipartConfig;
+import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
+import jakarta.servlet.http.Part;
+
+import Model.Category;
+import Model.User;
+import Service.CategoryService;
+import Service.impl.CategoryServiceImpl;
+import Utils.UploadHelper;
+
+@WebServlet(urlPatterns = { "/admin/category/add" })
+@MultipartConfig(
+    fileSizeThreshold = 1024 * 1024,
+    maxFileSize       = 1024 * 1024 * 5,
+    maxRequestSize    = 1024 * 1024 * 10
+)
+public class CategoryAddController extends HttpServlet {
+    private static final long serialVersionUID = 1L;
+
+    CategoryService cateService = new CategoryServiceImpl();
+
+    @Override
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp)
+            throws ServletException, IOException {
+
+        HttpSession session = req.getSession(false);
+        if (session == null || !(session.getAttribute("account") instanceof User)) {
+            resp.sendRedirect(req.getContextPath() + "/login"); return;
+        }
+        if (((User) session.getAttribute("account")).getRoleid() != 1) {
+            resp.sendRedirect(req.getContextPath() + "/user/home"); return;
+        }
+        req.getRequestDispatcher("/views/admin/add-category.jsp").forward(req, resp);
+    }
+
+    @Override
+    protected void doPost(HttpServletRequest req, HttpServletResponse resp)
+            throws ServletException, IOException {
+
+        req.setCharacterEncoding("UTF-8");
+
+        String name = req.getParameter("name");
+        if (name == null || name.trim().isEmpty()) {
+            req.setAttribute("error", "Tên danh mục không được để trống!");
+            req.getRequestDispatcher("/views/admin/add-category.jsp").forward(req, resp);
+            return;
+        }
+
+        // Upload ảnh qua UploadHelper
+        String iconPath = "";
+        Part filePart = req.getPart("icon");
+        if (filePart != null && filePart.getSize() > 0) {
+            iconPath = UploadHelper.uploadImage(filePart, req.getServletContext());
+        }
+
+        Category category = new Category();
+        category.setName(name.trim());
+        category.setIcon(iconPath);
+        cateService.insert(category);
+
+        resp.sendRedirect(req.getContextPath() + "/admin/category/list");
+    }
+}

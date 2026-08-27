@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<persistence xmlns="https://jakarta.ee/xml/ns/persistence"
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xsi:schemaLocation="https://jakarta.ee/xml/ns/persistence
+                                 https://jakarta.ee/xml/ns/persistence/persistence_3_1.xsd"
+             version="3.1">
+
+    <!--
+        Persistence Unit: "CategoryPU"
+        - transaction-type="RESOURCE_LOCAL" -> quản lý transaction thủ công
+          (không dùng JTA vì Tomcat không phải full Jakarta EE server)
+        - provider: Hibernate 6.x
+    -->
+    <persistence-unit name="CategoryPU" transaction-type="RESOURCE_LOCAL">
+
+        <provider>org.hibernate.jpa.HibernatePersistenceProvider</provider>
+
+        <!-- Khai báo các Entity class sẽ dùng JPA -->
+        <class>Model.Category</class>
+
+        <properties>
+            <!-- ── Kết nối SQL Server ── -->
+            <property name="jakarta.persistence.jdbc.driver"
+                      value="com.microsoft.sqlserver.jdbc.SQLServerDriver"/>
+            <property name="jakarta.persistence.jdbc.url"
+                      value="jdbc:sqlserver://localhost:1433;databaseName=ltws3;encrypt=false;trustServerCertificate=true;"/>
+            <property name="jakarta.persistence.jdbc.user"     value="sa"/>
+            <property name="jakarta.persistence.jdbc.password" value="0373703896Hao@"/>
+
+            <!-- ── Hibernate dialect cho SQL Server ── -->
+            <property name="hibernate.dialect"
+                      value="org.hibernate.dialect.SQLServerDialect"/>
+
+            <!-- ── DDL: validate = kiểm tra schema khớp, không tự tạo/sửa bảng ── -->
+            <!-- Đổi thành "update" nếu muốn Hibernate tự tạo/cập nhật bảng       -->
+            <property name="hibernate.hbm2ddl.auto" value="validate"/>
+
+            <!-- ── Hiển thị SQL ra console để dễ debug ── -->
+            <property name="hibernate.show_sql"   value="true"/>
+            <property name="hibernate.format_sql" value="true"/>
+
+            <!-- ── Tắt Open Session in View (phù hợp với Servlet/JSP) ── -->
+            <property name="hibernate.enable_lazy_load_no_trans" value="false"/>
+        </properties>
+
+    </persistence-unit>
+
+</persistence>
