@@ -1,6 +1,9 @@
 # Maven build output
 target/
 
+# SmartTomcat plugin config (IntelliJ)
+.smarttomcat/
+
 # IntelliJ IDEA
 .idea/
 *.iml
