@@ -18,12 +18,6 @@ import Service.impl.UserServiceImpl;
  * Xử lý 2 trường hợp:
  * 1. Đăng nhập thường  -> session key "account" chứa object User
  * 2. Đăng nhập cookie  -> session key "username" chứa String username
- *                         -> load User từ DB rồi lưu vào "account"
- *
- * Phân quyền theo roleid:
- *   roleid == 1  -> /admin/category/list
- *   roleid == 2  -> /manager/home
- *   còn lại      -> /user/home
  */
 @SuppressWarnings("serial")
 @WebServlet(urlPatterns = "/waiting")

@@ -1,5 +1,5 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
-    <%@ taglib prefix="c" uri="jakarta.tags.core" %>
+    <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
         <!DOCTYPE html>
         <html lang="vi">
 
@@ -237,7 +237,10 @@
                                         <label>
                                             <input type="checkbox" name="remember"> Nhớ tôi
                                         </label>
-                                        <span>Quên mật khẩu?</span>
+                                        <a href="${pageContext.request.contextPath}/forgot-password"
+                                           style="color:#111;font-size:0.85rem;text-decoration:none;font-weight:600">
+                                            Quên mật khẩu?
+                                        </a>
                                     </div>
 
                                     <button type="submit" class="btn-submit">Đăng nhập</button>

@@ -13,9 +13,9 @@ import jakarta.servlet.http.HttpServletResponse;
 
 /**
  * Servlet serve ảnh - giải quyết vấn đề Eclipse WTP không serve static file
- * URL: /img?name=ao-nam.png
+ * URL: /img?name=ao-nam.png hoặc /images/ao-nam.png
  */
-@WebServlet("/img")
+@WebServlet(urlPatterns = {"/img", "/images/*"})
 public class ImageServlet extends HttpServlet {
     private static final long serialVersionUID = 1L;
 
@@ -23,9 +23,19 @@ public class ImageServlet extends HttpServlet {
     protected void doGet(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
 
+        // Lấy filename từ query param hoặc path
         String fileName = req.getParameter("name");
         if (fileName == null || fileName.isEmpty()) {
-            resp.sendError(404); return;
+            // Nếu không có param, lấy từ path: /images/abc.png → abc.png
+            String pathInfo = req.getPathInfo();
+            if (pathInfo != null && !pathInfo.isEmpty()) {
+                fileName = pathInfo.substring(1); // bỏ dấu / đầu
+            }
+        }
+        
+        if (fileName == null || fileName.isEmpty()) {
+            resp.sendError(404); 
+            return;
         }
 
         // Tìm ảnh trong wtpwebapps trước

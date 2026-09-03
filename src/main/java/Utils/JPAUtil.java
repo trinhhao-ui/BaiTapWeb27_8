@@ -6,17 +6,6 @@ import jakarta.persistence.Persistence;
 
 /**
  * JPAUtil - Singleton quản lý EntityManagerFactory
- *
- * EntityManagerFactory rất nặng (khởi tạo 1 lần duy nhất khi ứng dụng start).
- * EntityManager nhẹ hơn, tạo mới mỗi request rồi đóng lại sau khi dùng xong.
- *
- * Cách dùng:
- *   EntityManager em = JPAUtil.getEntityManager();
- *   try {
- *       // ... thao tác JPA ...
- *   } finally {
- *       em.close();
- *   }
  */
 public class JPAUtil {
 

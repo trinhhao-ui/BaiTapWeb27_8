@@ -1,152 +1,117 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
-    <%@ taglib prefix="c" uri="jakarta.tags.core" %>
-        <!DOCTYPE html>
-        <html lang="vi">
+    <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+        <jsp:include page="/common/header.jsp">
+            <jsp:param name="title" value="Trang chủ" />
+        </jsp:include>
 
-        <head>
-            <meta charset="UTF-8">
-            <title>Trang người dùng</title>
-            <style>
-                * {
-                    margin: 0;
-                    padding: 0;
-                    box-sizing: border-box;
-                }
+        <style>
+            .home-wrap {
+                max-width: 560px;
+                margin: 0 auto;
+            }
 
-                body {
-                    font-family: 'Segoe UI', Arial, sans-serif;
-                    background: #fff;
-                    color: #111;
-                    min-height: 100vh;
-                    display: flex;
-                    flex-direction: column;
-                }
+            .home-wrap h1 {
+                font-size: 2.6rem;
+                font-weight: 800;
+                letter-spacing: -1px;
+                margin-bottom: 14px;
+                color: #2c3e50;
+                line-height: 1.2;
+            }
 
-                header {
-                    border-bottom: 2px solid #111;
-                    padding: 18px 40px;
-                    display: flex;
-                    justify-content: space-between;
-                    align-items: center;
-                }
+            .home-divider {
+                width: 40px;
+                height: 3px;
+                background: #2c3e50;
+                margin-bottom: 28px;
+                border-radius: 2px;
+            }
 
-                header .logo {
-                    font-size: 1.1rem;
-                    font-weight: 700;
-                    letter-spacing: 2px;
-                    text-transform: uppercase;
-                }
+            .info-card {
+                background: #fff;
+                border-radius: 10px;
+                box-shadow: 0 4px 20px rgba(0, 0, 0, .07);
+                overflow: hidden;
+            }
 
-                header .right {
-                    display: flex;
-                    align-items: center;
-                    gap: 20px;
-                }
+            .info-table {
+                width: 100%;
+                border-collapse: collapse;
+            }
 
-                header .username {
-                    font-size: 0.85rem;
-                    color: #888;
-                }
+            .info-table td {
+                padding: 14px 20px;
+                font-size: 0.9rem;
+                border-bottom: 1px solid #f0f0f0;
+            }
 
-                header a {
-                    color: #111;
-                    text-decoration: none;
-                    font-size: 0.85rem;
-                    font-weight: 700;
-                    letter-spacing: 1px;
-                    text-transform: uppercase;
-                    border-bottom: 2px solid #111;
-                    padding-bottom: 2px;
-                }
+            .info-table tr:last-child td {
+                border-bottom: none;
+            }
 
-                header a:hover {
-                    opacity: 0.5;
-                }
+            .info-table td:first-child {
+                color: #aaa;
+                font-size: 0.72rem;
+                font-weight: 700;
+                letter-spacing: 1px;
+                text-transform: uppercase;
+                width: 130px;
+                background: #fafafa;
+            }
 
-                main {
-                    flex: 1;
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    padding: 60px 40px;
-                }
+            .badge {
+                display: inline-block;
+                padding: 3px 10px;
+                background: #eaf0ff;
+                color: #2980b9;
+                font-size: 0.72rem;
+                font-weight: 700;
+                letter-spacing: .5px;
+                text-transform: uppercase;
+                border-radius: 20px;
+            }
 
-                .content {
-                    max-width: 520px;
-                    width: 100%;
-                }
+            .avatar-home {
+                width: 56px;
+                height: 56px;
+                border-radius: 50%;
+                object-fit: cover;
+                border: 2px solid #e8e8e8;
+                margin-bottom: 16px;
+                display: block;
+            }
 
-                .content h1 {
-                    font-size: 2.8rem;
-                    font-weight: 800;
-                    letter-spacing: -1px;
-                    margin-bottom: 16px;
-                }
+            .btn-profile {
+                display: inline-block;
+                margin-top: 20px;
+                padding: 11px 24px;
+                background: #2c3e50;
+                color: #fff;
+                text-decoration: none;
+                border-radius: 6px;
+                font-size: 0.85rem;
+                font-weight: 700;
+                letter-spacing: .5px;
+                transition: background .2s;
+            }
 
-                .divider {
-                    width: 40px;
-                    height: 3px;
-                    background: #111;
-                    margin-bottom: 24px;
-                }
+            .btn-profile:hover {
+                background: #34495e;
+            }
+        </style>
 
-                .info-table {
-                    width: 100%;
-                    border-collapse: collapse;
-                }
+        <div class="home-wrap">
 
-                .info-table td {
-                    padding: 12px 0;
-                    font-size: 0.9rem;
-                    border-bottom: 1px solid #eee;
-                }
+            <%-- Avatar --%>
+                <c:if test="${not empty sessionScope.account.avatar}">
+                    <img src="${pageContext.request.contextPath}/${sessionScope.account.avatar}" class="avatar-home"
+                        alt="avatar">
+                </c:if>
 
-                .info-table td:first-child {
-                    color: #888;
-                    font-size: 0.75rem;
-                    font-weight: 700;
-                    letter-spacing: 1px;
-                    text-transform: uppercase;
-                    width: 130px;
-                }
+                <h1>Xin chào,<br>${sessionScope.account.fullName}</h1>
+                <div class="home-divider"></div>
 
-                .badge {
-                    display: inline-block;
-                    padding: 3px 10px;
-                    background: #f0f0f0;
-                    color: #555;
-                    font-size: 0.75rem;
-                    font-weight: 700;
-                    letter-spacing: 1px;
-                    text-transform: uppercase;
-                    border-radius: 3px;
-                }
-
-                footer {
-                    border-top: 1px solid #ddd;
-                    padding: 16px 40px;
-                    text-align: center;
-                    font-size: 0.8rem;
-                    color: #999;
-                }
-            </style>
-        </head>
-
-        <body>
-
-            <header>
-                <span class="logo">WebApp</span>
-                <div class="right">
-                    <%-- Dùng đúng session key "account" và getter getUserName() --%>
-                        <span class="username">${sessionScope.account.userName}</span>
-                        <a href="${pageContext.request.contextPath}/logout">Đăng xuất</a>
-                </div>
-            </header>
-
-            <main>
-                <div class="content">
-                    <h1>Hello,<br>${sessionScope.account.fullName}</h1>
-                    <div class="divider"></div>
+                <div class="info-card">
                     <table class="info-table">
                         <tr>
                             <td>Tài khoản</td>
@@ -161,14 +126,20 @@
                             <td>${not empty sessionScope.account.email ? sessionScope.account.email : '—'}</td>
                         </tr>
                         <tr>
+                            <td>Điện thoại</td>
+                            <td>${not empty sessionScope.account.phone ? sessionScope.account.phone : '—'}</td>
+                        </tr>
+                        <tr>
                             <td>Vai trò</td>
                             <td><span class="badge">User</span></td>
                         </tr>
                     </table>
                 </div>
-            </main>
 
-            <footer>&copy; 2026 WebApp</footer>
-        </body>
+                <a href="${pageContext.request.contextPath}/user/profile" class="btn-profile">
+                    &#9998; Chỉnh sửa hồ sơ
+                </a>
 
-        </html>
+        </div>
+
+        <jsp:include page="/common/footer.jsp" />

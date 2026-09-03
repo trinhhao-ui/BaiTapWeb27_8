@@ -9,11 +9,11 @@
     <packaging>war</packaging>
 
     <dependencies>
-        <!-- Jakarta Servlet API - Tomcat 11 -->
+        <!-- Jakarta Servlet API - Tomcat 10.1 (Jakarta EE 9) -->
         <dependency>
             <groupId>jakarta.servlet</groupId>
             <artifactId>jakarta.servlet-api</artifactId>
-            <version>6.0.0</version>
+            <version>5.0.0</version>
             <scope>provided</scope>
         </dependency>
 
@@ -21,7 +21,7 @@
         <dependency>
             <groupId>jakarta.servlet.jsp</groupId>
             <artifactId>jakarta.servlet.jsp-api</artifactId>
-            <version>3.1.0</version>
+            <version>3.0.0</version>
             <scope>provided</scope>
         </dependency>
 
@@ -32,24 +32,24 @@
             <version>12.6.1.jre11</version>
         </dependency>
 
-        <!-- JSTL cho Jakarta EE 10 (Tomcat 11) -->
+        <!-- JSTL cho Jakarta EE 9 (Tomcat 10.1) -->
         <dependency>
             <groupId>jakarta.servlet.jsp.jstl</groupId>
             <artifactId>jakarta.servlet.jsp.jstl-api</artifactId>
-            <version>3.0.0</version>
+            <version>2.0.0</version>
         </dependency>
         <dependency>
             <groupId>org.glassfish.web</groupId>
             <artifactId>jakarta.servlet.jsp.jstl</artifactId>
-            <version>3.0.1</version>
+            <version>2.0.0</version>
         </dependency>
 
         <!-- ===== JPA / Hibernate ===== -->
-        <!-- Jakarta Persistence API 3.1 (tương thích Jakarta EE 10) -->
+        <!-- Jakarta Persistence API 3.0 (tương thích Jakarta EE 9) -->
         <dependency>
             <groupId>jakarta.persistence</groupId>
             <artifactId>jakarta.persistence-api</artifactId>
-            <version>3.1.0</version>
+            <version>3.0.0</version>
         </dependency>
 
         <!-- Hibernate ORM 6 - implementation của Jakarta Persistence 3.1 -->
@@ -59,8 +59,20 @@
             <version>6.4.4.Final</version>
         </dependency>
 
-        <!-- Hibernate hỗ trợ SQL Server dialect -->
-        <!-- Dialect tự động detect qua hibernate.dialect trong persistence.xml -->
+        <!-- ===== Email (JavaMail / Jakarta Mail) ===== -->
+        <!-- Gửi OTP qua Gmail SMTP -->
+        <dependency>
+            <groupId>com.sun.mail</groupId>
+            <artifactId>jakarta.mail</artifactId>
+            <version>2.0.1</version>
+        </dependency>
+
+        <!-- ===== Sitemesh 3 - Layout/Decorator framework ===== -->
+        <dependency>
+            <groupId>org.sitemesh</groupId>
+            <artifactId>sitemesh</artifactId>
+            <version>3.2.2</version>
+        </dependency>
     </dependencies>
 
     <build>

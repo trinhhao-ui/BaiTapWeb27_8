@@ -12,11 +12,6 @@ import jakarta.persistence.Table;
  *
  * @Entity  -> Hibernate quản lý class này như một bảng
  * @Table   -> map tới bảng "Category" trong SQL Server
- *
- * Mapping cột:
- *   cate_id   -> id   (PK, IDENTITY)
- *   cate_name -> name
- *   icons     -> icon
  */
 @Entity
 @Table(name = "Category")

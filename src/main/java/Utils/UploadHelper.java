@@ -10,9 +10,6 @@ import jakarta.servlet.http.Part;
 
 /**
  * Tiện ích xử lý upload ảnh
- * Lưu ảnh vào 2 nơi:
- *   1. wtpwebapps (đang chạy)  -> hiện ảnh ngay
- *   2. src/main/webapp/images/ -> giữ sau khi redeploy
  */
 public class UploadHelper {
 

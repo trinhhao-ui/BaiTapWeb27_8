@@ -2,24 +2,16 @@ package DAO;
 
 import Model.User;
 
-/**
- * TẦNG DAO - Interface
- * Định nghĩa các thao tác với bảng users trong database
- */
 public interface UserDao {
 
-    // Lấy user theo username - dùng cho đăng nhập
-    User get(String username);
+    User    get(String username);
+    User    getByEmail(String email);       // thêm mới - dùng cho quên mật khẩu
+    void    insert(User user);
+    void    updateStatus(int userId, int status);   // kích hoạt / khóa tài khoản
+    void    updateOtp(int userId, String otp, java.sql.Timestamp expiry); // lưu OTP
+    void    updatePassword(int userId, String newPassword);              // đặt lại mật khẩu
 
-    // Thêm user mới - dùng cho đăng ký
-    void insert(User user);
-
-    // Kiểm tra email đã tồn tại chưa
     boolean checkExistEmail(String email);
-
-    // Kiểm tra username đã tồn tại chưa
     boolean checkExistUsername(String username);
-
-    // Kiểm tra phone đã tồn tại chưa
     boolean checkExistPhone(String phone);
 }

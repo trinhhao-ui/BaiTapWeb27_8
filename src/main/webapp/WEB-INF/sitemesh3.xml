@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<sitemesh>
+
+    <!-- Exclude các trang không dùng decorator -->
+    <mapping path="/login"            exclude="true"/>
+    <mapping path="/register"         exclude="true"/>
+    <mapping path="/verify-otp"       exclude="true"/>
+    <mapping path="/forgot-password"  exclude="true"/>
+    <mapping path="/reset-password"   exclude="true"/>
+    <mapping path="/logout"           exclude="true"/>
+    <mapping path="/waiting"          exclude="true"/>
+    <mapping path="/admin/*"          exclude="true"/>
+    <mapping path="/test-jpa"         exclude="true"/>
+    <mapping path="/images/*"         exclude="true"/>
+
+    <!-- Chỉ apply decorator cho /user/* -->
+    <mapping path="/user/*" decorator="/decorators/main.jsp"/>
+
+</sitemesh>
