@@ -11,7 +11,9 @@ import jakarta.servlet.http.HttpSession;
 
 import Model.User;
 import Service.CategoryService;
+import Service.ProductService;
 import Service.impl.CategoryServiceImpl;
+import Service.impl.ProductServiceImpl;
 
 /**
  * CONTROLLER - Trang Dashboard admin
@@ -21,7 +23,8 @@ import Service.impl.CategoryServiceImpl;
 @WebServlet("/admin/dashboard")
 public class AdminDashboardController extends HttpServlet {
 
-    CategoryService cateService = new CategoryServiceImpl();
+    CategoryService cateService    = new CategoryServiceImpl();
+    ProductService  productService = new ProductServiceImpl();
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp)
@@ -41,6 +44,9 @@ public class AdminDashboardController extends HttpServlet {
         // Đếm số danh mục để hiển thị trên dashboard
         int totalCategory = cateService.getAll().size();
         req.setAttribute("totalCategory", totalCategory);
+
+        long totalProduct = productService.countActive();
+        req.setAttribute("totalProduct", totalProduct);
 
         req.getRequestDispatcher("/views/admin/dashboard.jsp").forward(req, resp);
     }

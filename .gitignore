@@ -25,4 +25,4 @@ Thumbs.db
 *.log
 
 # Documentation files (không push lên)
-*.md
+# *.md   <- đã bỏ để cho phép README.md

@@ -1,101 +1,78 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
-<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
-<!DOCTYPE html>
-<html lang="vi">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kích hoạt tài khoản</title>
-    <style>
-        * { margin:0; padding:0; box-sizing:border-box; }
-        body {
-            font-family:'Segoe UI',Arial,sans-serif;
-            background:#f4f6f9;
-            min-height:100vh;
-            display:flex; align-items:center; justify-content:center;
-        }
-        .card {
-            background:#fff; border-radius:10px;
-            box-shadow:0 4px 20px rgba(0,0,0,.08);
-            padding:40px 36px; width:100%; max-width:420px;
-            text-align:center;
-        }
-        .icon { font-size:3rem; margin-bottom:12px; }
-        h2 { font-size:1.6rem; font-weight:800; color:#2c3e50; margin-bottom:6px; }
-        .sub {
-            font-size:0.9rem; color:#888; margin-bottom:24px; line-height:1.5;
-        }
-        .email-badge {
-            display:inline-block; background:#eaf4ff; color:#2980b9;
-            padding:4px 12px; border-radius:20px; font-size:0.85rem;
-            font-weight:600; margin-bottom:24px;
-        }
-        .alert-danger {
-            background:#fff5f5; border-left:3px solid #e74c3c;
-            color:#c0392b; padding:10px 14px; border-radius:4px;
-            font-size:0.88rem; margin-bottom:16px; text-align:left;
-        }
-        .alert-success {
-            background:#f0fff4; border-left:3px solid #27ae60;
-            color:#27ae60; padding:10px 14px; border-radius:4px;
-            font-size:0.88rem; margin-bottom:16px; text-align:left;
-        }
-        .otp-input {
-            width:100%; padding:14px; font-size:1.8rem; font-weight:700;
-            text-align:center; letter-spacing:12px;
-            border:2px solid #ddd; border-radius:8px; outline:none;
-            color:#2c3e50; transition:border-color .2s;
-            margin-bottom:20px;
-        }
-        .otp-input:focus { border-color:#3498db; }
-        .btn {
-            width:100%; padding:13px; border:none; border-radius:6px;
-            font-size:0.9rem; font-weight:700; cursor:pointer;
-            letter-spacing:.5px; transition:background .2s;
-        }
-        .btn-primary { background:#2c3e50; color:#fff; margin-bottom:10px; }
-        .btn-primary:hover { background:#34495e; }
-        .btn-secondary {
-            background:transparent; color:#888;
-            border:1px solid #ddd; font-size:0.85rem;
-        }
-        .btn-secondary:hover { background:#f8f8f8; }
-        .timer {
-            font-size:0.82rem; color:#bbb; margin-top:14px;
-        }
-        .timer span { color:#e74c3c; font-weight:700; }
-    </style>
-</head>
-<body>
-<div class="card">
-    <div class="icon">📧</div>
-    <h2>Xác minh Email</h2>
-    <p class="sub">Mã OTP đã được gửi đến địa chỉ email của bạn.</p>
-    <div class="email-badge">${sessionScope.pendingEmail}</div>
+    <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+        <!DOCTYPE html>
+        <html lang="vi">
 
-    <c:if test="${not empty alert}">
-        <div class="alert-danger">${alert}</div>
-    </c:if>
-    <c:if test="${not empty success}">
-        <div class="alert-success">${success}</div>
-    </c:if>
+        <head>
+            <title>Xác minh OTP</title>
+        </head>
 
-    <%-- Form xác minh OTP --%>
-    <form action="${pageContext.request.contextPath}/verify-otp" method="post">
-        <input type="hidden" name="action" value="verify">
-        <input type="text" name="otp" class="otp-input"
-               placeholder="• • • • • •" maxlength="6"
-               autocomplete="one-time-code" autofocus>
-        <button type="submit" class="btn btn-primary">Kích hoạt tài khoản</button>
-    </form>
+        <body>
 
-    <%-- Form gửi lại OTP --%>
-    <form action="${pageContext.request.contextPath}/verify-otp" method="post">
-        <input type="hidden" name="action" value="resend">
-        <button type="submit" class="btn btn-secondary">Gửi lại mã OTP</button>
-    </form>
+            <div class="auth-logo"><i class="bi bi-envelope-check-fill"></i></div>
+            <h2 class="auth-title">Xác Minh Email</h2>
+            <p class="auth-subtitle">Mã OTP đã được gửi đến</p>
 
-    <p class="timer">Mã OTP có hiệu lực trong <span>5 phút</span></p>
-</div>
-</body>
-</html>
+            <div class="text-center mb-3">
+                <span class="badge rounded-pill"
+                    style="background:#eaf4ff;color:#2980b9;font-size:.9rem;padding:6px 16px;font-weight:600">
+                    ${sessionScope.pendingEmail}
+                </span>
+            </div>
+
+            <c:if test="${not empty alert}">
+                <div class="alert alert-danger"><i class="bi bi-exclamation-circle-fill me-2"></i>${alert}</div>
+            </c:if>
+            <c:if test="${not empty success}">
+                <div class="alert alert-success"><i class="bi bi-check-circle-fill me-2"></i>${success}</div>
+            </c:if>
+
+            <form id="otpForm" action="${pageContext.request.contextPath}/verify-otp" method="post" novalidate>
+                <input type="hidden" name="action" value="verify">
+                <div class="form-group">
+                    <label class="form-label text-center d-block">Nhập mã OTP 6 chữ số</label>
+                    <input type="text" class="form-control text-center" id="otp" name="otp" maxlength="6" minlength="6"
+                        pattern="^[0-9]{6}$" autocomplete="one-time-code" placeholder="• • • • • •" autofocus required
+                        style="font-size:1.8rem;font-weight:700;letter-spacing:10px">
+                    <div class="invalid-feedback text-center">Mã OTP phải gồm đúng 6 chữ số.</div>
+                </div>
+                <button type="submit" class="btn btn-primary">
+                    <i class="bi bi-shield-check me-2"></i>Kích hoạt tài khoản
+                </button>
+            </form>
+
+            <div class="divider"><span>hoặc</span></div>
+
+            <form action="${pageContext.request.contextPath}/verify-otp" method="post">
+                <input type="hidden" name="action" value="resend">
+                <button type="submit" class="btn btn-outline-secondary">
+                    <i class="bi bi-arrow-repeat me-2"></i>Gửi lại mã OTP
+                </button>
+            </form>
+
+            <p class="text-center mt-3" style="font-size:.82rem;color:#adb5bd">
+                Mã OTP có hiệu lực trong <strong style="color:#e74c3c">5 phút</strong>
+            </p>
+
+            <script>
+                (function () {
+                    'use strict';
+                    const otpInput = document.getElementById('otp');
+
+                    // Chỉ cho nhập số
+                    otpInput.addEventListener('input', function () {
+                        this.value = this.value.replace(/[^0-9]/g, '');
+                    });
+
+                    document.getElementById('otpForm').addEventListener('submit', function (e) {
+                        if (!this.checkValidity()) {
+                            e.preventDefault();
+                            e.stopPropagation();
+                        }
+                        this.classList.add('was-validated');
+                    });
+                })();
+            </script>
+        </body>
+
+        </html>
