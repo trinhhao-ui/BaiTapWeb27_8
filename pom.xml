@@ -45,14 +45,14 @@
         </dependency>
 
         <!-- ===== JPA / Hibernate ===== -->
-        <!-- Jakarta Persistence API 3.0 (tương thích Jakarta EE 9) -->
+        <!-- Jakarta Persistence API 3.1 - bắt buộc cho Hibernate 6.4 -->
         <dependency>
             <groupId>jakarta.persistence</groupId>
             <artifactId>jakarta.persistence-api</artifactId>
-            <version>3.0.0</version>
+            <version>3.1.0</version>
         </dependency>
 
-        <!-- Hibernate ORM 6 - implementation của Jakarta Persistence 3.1 -->
+        <!-- Hibernate ORM 6.4 - implementation của Jakarta Persistence 3.1 -->
         <dependency>
             <groupId>org.hibernate.orm</groupId>
             <artifactId>hibernate-core</artifactId>

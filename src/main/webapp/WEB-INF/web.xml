@@ -5,23 +5,20 @@
                              https://jakarta.ee/xml/ns/jakartaee/web-app_6_0.xsd"
          version="6.0">
 
-    <!--
-        Sitemesh 3 Filter - DISABLED
-        Tomcat 10.1 + Sitemesh 3 có bug
-        Dùng JSP include pattern thay thế (đã test OK)
-    -->
-    <!--
+    <!-- =========================================================
+         Sitemesh 3 – custom filter inject body/title/head vào
+         request attributes (decoratedBody, decoratedTitle, decoratedHead)
+         trước khi forward sang decorator JSP.
+         ========================================================= -->
     <filter>
         <filter-name>sitemesh</filter-name>
-        <filter-class>org.sitemesh.config.ConfigurableSiteMeshFilter</filter-class>
+        <filter-class>Utils.AppSiteMeshFilter</filter-class>
     </filter>
-
     <filter-mapping>
         <filter-name>sitemesh</filter-name>
-        <url-pattern>/user/*</url-pattern>
+        <url-pattern>/*</url-pattern>
         <dispatcher>REQUEST</dispatcher>
         <dispatcher>FORWARD</dispatcher>
     </filter-mapping>
-    -->
 
 </web-app>

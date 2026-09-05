@@ -63,19 +63,75 @@ public class login_controller extends HttpServlet {
         String remember  = req.getParameter("remember");
         boolean rememberMe = "on".equals(remember);
 
-        // Validate không rỗng
-        if (username == null || username.isEmpty()
-                || password == null || password.isEmpty()) {
-            req.setAttribute("alert", "Tài khoản hoặc mật khẩu không được để trống!");
+        // ========== SERVER-SIDE VALIDATION ==========
+        
+        // 1. Validate không rỗng
+        if (username == null || username.trim().isEmpty()) {
+            req.setAttribute("alert", "Tên đăng nhập không được để trống!");
+            req.setAttribute("alertClass", "alert-danger");
             req.getRequestDispatcher("/views/login.jsp").forward(req, resp);
             return;
         }
 
+        if (password == null || password.isEmpty()) {
+            req.setAttribute("alert", "Mật khẩu không được để trống!");
+            req.setAttribute("alertClass", "alert-danger");
+            req.getRequestDispatcher("/views/login.jsp").forward(req, resp);
+            return;
+        }
+
+        // 2. Validate độ dài username (min 3 chars)
+        username = username.trim();
+        if (username.length() < 3) {
+            req.setAttribute("alert", "Tên đăng nhập phải có ít nhất 3 ký tự!");
+            req.setAttribute("alertClass", "alert-danger");
+            req.getRequestDispatcher("/views/login.jsp").forward(req, resp);
+            return;
+        }
+
+        // 3. Validate độ dài password (min 6 chars)
+        if (password.length() < 6) {
+            req.setAttribute("alert", "Mật khẩu phải có ít nhất 6 ký tự!");
+            req.setAttribute("alertClass", "alert-danger");
+            req.getRequestDispatcher("/views/login.jsp").forward(req, resp);
+            return;
+        }
+
+        // 4. Validate username format (chỉ chữ, số và underscore)
+        if (!username.matches("^[a-zA-Z0-9_]+$")) {
+            req.setAttribute("alert", "Tên đăng nhập chỉ được chứa chữ cái, số và dấu gạch dưới!");
+            req.setAttribute("alertClass", "alert-danger");
+            req.getRequestDispatcher("/views/login.jsp").forward(req, resp);
+            return;
+        }
+
+        // 5. Kiểm tra SQL Injection patterns (basic security)
+        String[] sqlPatterns = {"'", "\"", "--", ";", "/*", "*/", "xp_", "sp_", "DROP", "DELETE", "INSERT", "UPDATE"};
+        for (String pattern : sqlPatterns) {
+            if (username.toUpperCase().contains(pattern) || password.toUpperCase().contains(pattern)) {
+                req.setAttribute("alert", "Phát hiện ký tự không hợp lệ trong thông tin đăng nhập!");
+                req.setAttribute("alertClass", "alert-danger");
+                req.getRequestDispatcher("/views/login.jsp").forward(req, resp);
+                return;
+            }
+        }
+
+        // ========== AUTHENTICATION ==========
         UserService service = new UserServiceImpl();
-        User user = service.login(username, password);
+        User user = null;
+        
+        try {
+            user = service.login(username, password);
+        } catch (Exception e) {
+            req.setAttribute("alert", "Đã xảy ra lỗi trong quá trình đăng nhập. Vui lòng thử lại!");
+            req.setAttribute("alertClass", "alert-danger");
+            req.getRequestDispatcher("/views/login.jsp").forward(req, resp);
+            return;
+        }
 
         if (user == null) {
-            req.setAttribute("alert", "Tài khoản hoặc mật khẩu không đúng!");
+            req.setAttribute("alert", "Tên đăng nhập hoặc mật khẩu không đúng!");
+            req.setAttribute("alertClass", "alert-danger");
             req.getRequestDispatcher("/views/login.jsp").forward(req, resp);
             return;
         }
@@ -89,6 +145,7 @@ public class login_controller extends HttpServlet {
             session.setAttribute("pendingEmail", user.getEmail());
             req.setAttribute("alert", "Tài khoản chưa được kích hoạt! "
                     + "Chúng tôi đã gửi lại OTP về email " + user.getEmail());
+            req.setAttribute("alertClass", "alert-warning");
             req.getRequestDispatcher("/views/login.jsp").forward(req, resp);
             return;
         }
@@ -100,6 +157,8 @@ public class login_controller extends HttpServlet {
         if (rememberMe) {
             Cookie cookie = new Cookie(COOKIE_REMEMBER, username);
             cookie.setMaxAge(30 * 60); // 30 phút
+            cookie.setHttpOnly(true); // Security: prevent XSS
+            cookie.setPath(req.getContextPath() + "/");
             resp.addCookie(cookie);
         }
 

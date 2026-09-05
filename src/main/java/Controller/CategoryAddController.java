@@ -47,26 +47,181 @@ public class CategoryAddController extends HttpServlet {
             throws ServletException, IOException {
 
         req.setCharacterEncoding("UTF-8");
+        
+        // Check admin authentication
+        HttpSession session = req.getSession(false);
+        if (session == null || !(session.getAttribute("account") instanceof User)) {
+            resp.sendRedirect(req.getContextPath() + "/login");
+            return;
+        }
+        if (((User) session.getAttribute("account")).getRoleid() != 1) {
+            resp.sendRedirect(req.getContextPath() + "/user/home");
+            return;
+        }
 
-        String name = req.getParameter("name");
-        if (name == null || name.trim().isEmpty()) {
-            req.setAttribute("error", "Tên danh mục không được để trống!");
+        String categoryname = req.getParameter("categoryname");
+        String statusStr    = req.getParameter("status");
+
+        // ========== SERVER-SIDE VALIDATION ==========
+
+        // 1. Validate categoryname required
+        if (categoryname == null || categoryname.trim().isEmpty()) {
+            req.setAttribute("alert", "Tên danh mục không được để trống!");
+            req.setAttribute("alertClass", "alert-danger");
             req.getRequestDispatcher("/views/admin/add-category.jsp").forward(req, resp);
             return;
         }
 
-        // Upload ảnh qua UploadHelper
-        String iconPath = "";
-        Part filePart = req.getPart("icon");
-        if (filePart != null && filePart.getSize() > 0) {
-            iconPath = UploadHelper.uploadImage(filePart, req.getServletContext());
+        // 2. Trim categoryname
+        categoryname = categoryname.trim();
+
+        // 3. Validate categoryname length (3-100)
+        if (categoryname.length() < 3 || categoryname.length() > 100) {
+            req.setAttribute("alert", "Tên danh mục phải có từ 3-100 ký tự!");
+            req.setAttribute("alertClass", "alert-danger");
+            req.getRequestDispatcher("/views/admin/add-category.jsp").forward(req, resp);
+            return;
         }
 
-        Category category = new Category();
-        category.setName(name.trim());
-        category.setIcon(iconPath);
-        cateService.insert(category);
+        // 4. Validate status required
+        if (statusStr == null || statusStr.isEmpty()) {
+            req.setAttribute("alert", "Vui lòng chọn trạng thái!");
+            req.setAttribute("alertClass", "alert-danger");
+            req.getRequestDispatcher("/views/admin/add-category.jsp").forward(req, resp);
+            return;
+        }
 
-        resp.sendRedirect(req.getContextPath() + "/admin/category/list");
+        // 5. Parse and validate status value
+        int status;
+        try {
+            status = Integer.parseInt(statusStr);
+            if (status != 0 && status != 1) {
+                throw new NumberFormatException();
+            }
+        } catch (NumberFormatException e) {
+            req.setAttribute("alert", "Trạng thái không hợp lệ!");
+            req.setAttribute("alertClass", "alert-danger");
+            req.getRequestDispatcher("/views/admin/add-category.jsp").forward(req, resp);
+            return;
+        }
+
+        // 6. Security: Check for SQL injection patterns
+        String[] sqlPatterns = {"'", "\"", "--", ";", "/*", "*/", "xp_", "sp_"};
+        for (String pattern : sqlPatterns) {
+            if (categoryname.contains(pattern)) {
+                req.setAttribute("alert", "Phát hiện ký tự không hợp lệ trong tên danh mục!");
+                req.setAttribute("alertClass", "alert-danger");
+                req.getRequestDispatcher("/views/admin/add-category.jsp").forward(req, resp);
+                return;
+            }
+        }
+
+        // 7. Check duplicate category name
+        if (cateService.get(categoryname) != null) {
+            req.setAttribute("alert", "Tên danh mục đã tồn tại!");
+            req.setAttribute("alertClass", "alert-danger");
+            req.getRequestDispatcher("/views/admin/add-category.jsp").forward(req, resp);
+            return;
+        }
+
+        // ========== FILE UPLOAD VALIDATION ==========
+        String imagesPath = null;
+        
+        try {
+            Part filePart = req.getPart("images");
+            
+            if (filePart != null && filePart.getSize() > 0) {
+                String fileName = UploadHelper.getFileName(filePart);
+                
+                if (fileName != null && !fileName.isEmpty()) {
+                    // 8. Validate file type
+                    String contentType = filePart.getContentType();
+                    String[] allowedTypes = {"image/png", "image/jpeg", "image/jpg", "image/gif", "image/webp"};
+                    boolean validType = false;
+                    
+                    for (String type : allowedTypes) {
+                        if (type.equals(contentType)) {
+                            validType = true;
+                            break;
+                        }
+                    }
+                    
+                    if (!validType) {
+                        req.setAttribute("alert", "Chỉ được upload file ảnh (PNG, JPG, GIF, WEBP)!");
+                        req.setAttribute("alertClass", "alert-danger");
+                        req.getRequestDispatcher("/views/admin/add-category.jsp").forward(req, resp);
+                        return;
+                    }
+
+                    // 9. Validate file size
+                    long fileSize = filePart.getSize();
+                    long maxSize = 5 * 1024 * 1024; // 5MB
+                    
+                    if (fileSize > maxSize) {
+                        req.setAttribute("alert", "Kích thước file không được vượt quá 5MB!");
+                        req.setAttribute("alertClass", "alert-danger");
+                        req.getRequestDispatcher("/views/admin/add-category.jsp").forward(req, resp);
+                        return;
+                    }
+
+                    // 10. Validate file extension
+                    String fileExtension = "";
+                    int lastDotIndex = fileName.lastIndexOf('.');
+                    if (lastDotIndex > 0) {
+                        fileExtension = fileName.substring(lastDotIndex + 1).toLowerCase();
+                    }
+                    
+                    String[] allowedExtensions = {"png", "jpg", "jpeg", "gif", "webp"};
+                    boolean validExtension = false;
+                    
+                    for (String ext : allowedExtensions) {
+                        if (ext.equals(fileExtension)) {
+                            validExtension = true;
+                            break;
+                        }
+                    }
+                    
+                    if (!validExtension) {
+                        req.setAttribute("alert", "File phải có định dạng: PNG, JPG, GIF, WEBP!");
+                        req.setAttribute("alertClass", "alert-danger");
+                        req.getRequestDispatcher("/views/admin/add-category.jsp").forward(req, resp);
+                        return;
+                    }
+
+                    // Valid file - upload
+                    imagesPath = UploadHelper.uploadImage(filePart, req.getServletContext());
+                }
+            }
+        } catch (IllegalStateException e) {
+            req.setAttribute("alert", "File quá lớn! Kích thước tối đa là 5MB.");
+            req.setAttribute("alertClass", "alert-danger");
+            req.getRequestDispatcher("/views/admin/add-category.jsp").forward(req, resp);
+            return;
+        } catch (Exception e) {
+            e.printStackTrace();
+            req.setAttribute("alert", "Lỗi khi upload ảnh: " + e.getMessage());
+            req.setAttribute("alertClass", "alert-danger");
+            req.getRequestDispatcher("/views/admin/add-category.jsp").forward(req, resp);
+            return;
+        }
+
+        // ========== INSERT CATEGORY ==========
+        try {
+            Category category = new Category();
+            category.setName(categoryname);
+            category.setIcon(imagesPath);
+            
+            cateService.insert(category);
+            
+            // Success - redirect to list with success message
+            session.setAttribute("successMessage", "Thêm danh mục thành công!");
+            resp.sendRedirect(req.getContextPath() + "/admin/category/list");
+            
+        } catch (Exception e) {
+            e.printStackTrace();
+            req.setAttribute("alert", "Đã xảy ra lỗi khi thêm danh mục: " + e.getMessage());
+            req.setAttribute("alertClass", "alert-danger");
+            req.getRequestDispatcher("/views/admin/add-category.jsp").forward(req, resp);
+        }
     }
 }
