@@ -63,8 +63,8 @@ public class CategoryEditController extends HttpServlet {
             return;
         }
 
-        String categoryidStr = req.getParameter("categoryid");
-        String categoryname  = req.getParameter("categoryname");
+        String categoryidStr = req.getParameter("id");
+        String categoryname  = req.getParameter("name");
         String statusStr     = req.getParameter("status");
 
         // ========== SERVER-SIDE VALIDATION ==========
@@ -117,29 +117,8 @@ public class CategoryEditController extends HttpServlet {
             return;
         }
 
-        // 6. Validate status required
-        if (statusStr == null || statusStr.isEmpty()) {
-            req.setAttribute("alert", "Vui lòng chọn trạng thái!");
-            req.setAttribute("alertClass", "alert-danger");
-            req.setAttribute("category", oldCategory);
-            req.getRequestDispatcher("/views/admin/edit-category.jsp").forward(req, resp);
-            return;
-        }
+        // 6. Skip status validation - Category model has no status field
 
-        // 7. Parse and validate status value
-        int status;
-        try {
-            status = Integer.parseInt(statusStr);
-            if (status != 0 && status != 1) {
-                throw new NumberFormatException();
-            }
-        } catch (NumberFormatException e) {
-            req.setAttribute("alert", "Trạng thái không hợp lệ!");
-            req.setAttribute("alertClass", "alert-danger");
-            req.setAttribute("category", oldCategory);
-            req.getRequestDispatcher("/views/admin/edit-category.jsp").forward(req, resp);
-            return;
-        }
 
         // 8. Security: Check for SQL injection patterns
         String[] sqlPatterns = {"'", "\"", "--", ";", "/*", "*/", "xp_", "sp_"};
@@ -167,7 +146,7 @@ public class CategoryEditController extends HttpServlet {
         String imagesPath = oldCategory.getIcon(); // Keep old image by default
         
         try {
-            Part filePart = req.getPart("images");
+            Part filePart = req.getPart("icon");
             
             if (filePart != null && filePart.getSize() > 0) {
                 String fileName = UploadHelper.getFileName(filePart);

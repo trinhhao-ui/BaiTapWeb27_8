@@ -18,6 +18,7 @@
         <!-- Khai báo các Entity class sẽ dùng JPA -->
         <class>Model.Category</class>
         <class>Model.User</class>
+        <class>Model.Product</class>
 
         <properties>
             <!-- ── Kết nối SQL Server ── -->

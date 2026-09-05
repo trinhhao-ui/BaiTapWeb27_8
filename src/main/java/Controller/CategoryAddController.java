@@ -59,7 +59,7 @@ public class CategoryAddController extends HttpServlet {
             return;
         }
 
-        String categoryname = req.getParameter("categoryname");
+        String categoryname = req.getParameter("name");
         String statusStr    = req.getParameter("status");
 
         // ========== SERVER-SIDE VALIDATION ==========
@@ -83,29 +83,7 @@ public class CategoryAddController extends HttpServlet {
             return;
         }
 
-        // 4. Validate status required
-        if (statusStr == null || statusStr.isEmpty()) {
-            req.setAttribute("alert", "Vui lòng chọn trạng thái!");
-            req.setAttribute("alertClass", "alert-danger");
-            req.getRequestDispatcher("/views/admin/add-category.jsp").forward(req, resp);
-            return;
-        }
-
-        // 5. Parse and validate status value
-        int status;
-        try {
-            status = Integer.parseInt(statusStr);
-            if (status != 0 && status != 1) {
-                throw new NumberFormatException();
-            }
-        } catch (NumberFormatException e) {
-            req.setAttribute("alert", "Trạng thái không hợp lệ!");
-            req.setAttribute("alertClass", "alert-danger");
-            req.getRequestDispatcher("/views/admin/add-category.jsp").forward(req, resp);
-            return;
-        }
-
-        // 6. Security: Check for SQL injection patterns
+        // 5. Security: Check for SQL injection patterns
         String[] sqlPatterns = {"'", "\"", "--", ";", "/*", "*/", "xp_", "sp_"};
         for (String pattern : sqlPatterns) {
             if (categoryname.contains(pattern)) {
@@ -116,7 +94,7 @@ public class CategoryAddController extends HttpServlet {
             }
         }
 
-        // 7. Check duplicate category name
+        // 6. Check duplicate category name
         if (cateService.get(categoryname) != null) {
             req.setAttribute("alert", "Tên danh mục đã tồn tại!");
             req.setAttribute("alertClass", "alert-danger");
@@ -128,7 +106,7 @@ public class CategoryAddController extends HttpServlet {
         String imagesPath = null;
         
         try {
-            Part filePart = req.getPart("images");
+            Part filePart = req.getPart("icon");
             
             if (filePart != null && filePart.getSize() > 0) {
                 String fileName = UploadHelper.getFileName(filePart);

@@ -1,13 +1,13 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
     <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
-        <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
+        <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
             <!DOCTYPE html>
             <html lang="vi">
 
             <head>
                 <meta charset="UTF-8">
                 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-                <title>Quản lý danh mục</title>
+                <title>Quản lý sản phẩm</title>
                 <style>
                     * {
                         margin: 0;
@@ -18,12 +18,9 @@
                     body {
                         font-family: 'Segoe UI', Arial, sans-serif;
                         background: #f0f2f5;
-                        display: flex;
-                        flex-direction: column;
                         min-height: 100vh;
                     }
 
-                    /* ── HEADER ── */
                     .header {
                         background: #1a2942;
                         color: #fff;
@@ -52,11 +49,7 @@
                         font-size: 0.9rem;
                     }
 
-                    .header .right span {
-                        opacity: 0.85;
-                    }
-
-                    .header .btn-logout {
+                    .btn-logout {
                         background: #e74c3c;
                         color: #fff;
                         border: none;
@@ -68,11 +61,10 @@
                         text-decoration: none;
                     }
 
-                    .header .btn-logout:hover {
+                    .btn-logout:hover {
                         background: #c0392b;
                     }
 
-                    /* ── SIDEBAR ── */
                     .sidebar {
                         width: 220px;
                         background: #1a2942;
@@ -101,7 +93,6 @@
                         align-items: center;
                         justify-content: center;
                         font-size: 2rem;
-                        color: #fff;
                     }
 
                     .sidebar .role {
@@ -120,8 +111,7 @@
                         color: rgba(255, 255, 255, 0.7);
                         text-decoration: none;
                         font-size: 0.9rem;
-                        transition: background 0.2s, color 0.2s;
-                        cursor: pointer;
+                        transition: background 0.2s;
                     }
 
                     .sidebar .menu-item:hover,
@@ -148,7 +138,8 @@
                         transition: color 0.2s;
                     }
 
-                    .sidebar .submenu a:hover {
+                    .sidebar .submenu a:hover,
+                    .sidebar .submenu a.active {
                         color: #fff;
                     }
 
@@ -156,12 +147,10 @@
                         content: '- ';
                     }
 
-                    /* ── MAIN CONTENT ── */
                     .main {
                         margin-left: 220px;
                         margin-top: 56px;
                         padding: 28px;
-                        flex: 1;
                     }
 
                     .page-title {
@@ -212,7 +201,6 @@
                         background: #2c3e50;
                     }
 
-                    /* Search bar */
                     .toolbar {
                         display: flex;
                         justify-content: space-between;
@@ -229,7 +217,6 @@
                         padding: 4px 8px;
                         border: 1px solid #ddd;
                         border-radius: 4px;
-                        margin: 0 4px;
                     }
 
                     .toolbar .search-box {
@@ -252,7 +239,6 @@
                         border-color: #1a2942;
                     }
 
-                    /* Table */
                     table {
                         width: 100%;
                         border-collapse: collapse;
@@ -273,9 +259,9 @@
                     }
 
                     td {
-                        padding: 12px 14px;
+                        padding: 11px 14px;
                         border-bottom: 1px solid #f0f0f0;
-                        font-size: 0.9rem;
+                        font-size: 0.88rem;
                         vertical-align: middle;
                     }
 
@@ -283,24 +269,47 @@
                         background: #fafbfc;
                     }
 
-                    .cate-img {
-                        width: 80px;
-                        height: 60px;
+                    .product-img {
+                        width: 64px;
+                        height: 52px;
                         object-fit: cover;
                         border-radius: 4px;
                         border: 1px solid #eee;
                     }
 
                     .no-img {
-                        width: 80px;
-                        height: 60px;
+                        width: 64px;
+                        height: 52px;
                         background: #f5f5f5;
                         border-radius: 4px;
                         display: flex;
                         align-items: center;
                         justify-content: center;
-                        font-size: 0.75rem;
+                        font-size: 0.72rem;
                         color: #bbb;
+                    }
+
+                    .price {
+                        font-weight: 700;
+                        color: #e74c3c;
+                    }
+
+                    .badge {
+                        display: inline-block;
+                        padding: 2px 10px;
+                        border-radius: 20px;
+                        font-size: 0.75rem;
+                        font-weight: 700;
+                    }
+
+                    .badge-active {
+                        background: #e8f5e9;
+                        color: #27ae60;
+                    }
+
+                    .badge-hidden {
+                        background: #ffeaea;
+                        color: #e74c3c;
                     }
 
                     .action-link {
@@ -329,7 +338,6 @@
 
             <body>
 
-                <!-- HEADER -->
                 <div class="header">
                     <div class="brand">Dashboard</div>
                     <div class="right">
@@ -338,49 +346,41 @@
                     </div>
                 </div>
 
-                <!-- SIDEBAR -->
                 <div class="sidebar">
                     <div class="profile">
                         <div class="avatar">👤</div>
                         <div class="role">Bạn là Admin</div>
                     </div>
-
                     <a href="${pageContext.request.contextPath}/admin/dashboard" class="menu-item">
                         <span class="icon">📊</span> Dashboard
                     </a>
-
-                    <div class="menu-item active">
+                    <div class="menu-item">
                         <span class="icon">📂</span> Quản lý Danh mục
                     </div>
                     <div class="submenu">
                         <a href="${pageContext.request.contextPath}/admin/category/add">Thêm danh mục mới</a>
                         <a href="${pageContext.request.contextPath}/admin/category/list">Danh sách danh mục</a>
                     </div>
-
-                    <a href="#" class="menu-item">
+                    <div class="menu-item active">
                         <span class="icon">🛍</span> Quản lý Sản phẩm
-                    </a>
+                    </div>
                     <div class="submenu">
                         <a href="${pageContext.request.contextPath}/admin/product/add">Thêm sản phẩm mới</a>
-                        <a href="${pageContext.request.contextPath}/admin/product/list">Danh sách sản phẩm</a>
+                        <a href="${pageContext.request.contextPath}/admin/product/list" class="active">Danh sách sản
+                            phẩm</a>
                     </div>
-
-                    <a href="#" class="menu-item">
-                        <span class="icon">👥</span> Quản lý Tài khoản
-                    </a>
+                    <a href="#" class="menu-item"><span class="icon">👥</span> Quản lý Tài khoản</a>
                 </div>
 
-                <!-- MAIN CONTENT -->
                 <div class="main">
-                    <div class="page-title">Quản lý danh mục</div>
-                    <div class="page-sub">Nơi bạn có thể quản lý danh mục của mình</div>
+                    <div class="page-title">Quản lý sản phẩm</div>
+                    <div class="page-sub">Danh sách toàn bộ sản phẩm</div>
 
                     <div class="card">
                         <div class="card-header">
-                            <h3>Danh sách danh mục</h3>
-                            <a href="${pageContext.request.contextPath}/admin/category/add" class="btn-add">+ Thêm danh
-                                mục
-                                mới</a>
+                            <h3>Danh sách sản phẩm</h3>
+                            <a href="${pageContext.request.contextPath}/admin/product/add" class="btn-add">+ Thêm sản
+                                phẩm mới</a>
                         </div>
 
                         <div class="toolbar">
@@ -397,46 +397,63 @@
                             </div>
                         </div>
 
-                        <table id="cateTable">
+                        <table id="productTable">
                             <thead>
                                 <tr>
                                     <th>STT</th>
-                                    <th>Hình ảnh</th>
-                                    <th>Tên danh mục</th>
+                                    <th>Ảnh</th>
+                                    <th>Tên sản phẩm</th>
+                                    <th>Danh mục</th>
+                                    <th>Giá</th>
+                                    <th>Số lượng</th>
+                                    <th>Trạng thái</th>
                                     <th>Hành động</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 <c:choose>
-                                    <c:when test="${empty cateList}">
+                                    <c:when test="${empty productList}">
                                         <tr class="empty-row">
-                                            <td colspan="4">Chưa có danh mục nào</td>
+                                            <td colspan="8">Chưa có sản phẩm nào</td>
                                         </tr>
                                     </c:when>
                                     <c:otherwise>
-                                        <c:forEach items="${cateList}" var="cate" varStatus="STT">
+                                        <c:forEach items="${productList}" var="p" varStatus="s">
                                             <tr>
-                                                <td>${STT.index + 1}</td>
+                                                <td>${s.index + 1}</td>
                                                 <td>
                                                     <c:choose>
-                                                        <c:when test="${not empty cate.icon}">
-                                                            <img class="cate-img"
-                                                                src="${pageContext.request.contextPath}/img?name=${fn:substringAfter(cate.icon, 'images/')}"
-                                                                alt="${cate.name}">
+                                                        <c:when test="${not empty p.image}">
+                                                            <img class="product-img"
+                                                                src="${pageContext.request.contextPath}/${p.image}"
+                                                                alt="${p.name}">
                                                         </c:when>
                                                         <c:otherwise>
                                                             <div class="no-img">Không có ảnh</div>
                                                         </c:otherwise>
                                                     </c:choose>
                                                 </td>
-                                                <td>${cate.name}</td>
+                                                <td><strong>${p.name}</strong></td>
+                                                <td>${p.category.name}</td>
+                                                <td class="price">
+                                                    <fmt:formatNumber value="${p.price}" pattern="#,##0" />đ
+                                                </td>
+                                                <td>${p.quantity}</td>
                                                 <td>
-                                                    <a href="${pageContext.request.contextPath}/admin/category/edit?id=${cate.id}"
+                                                    <c:choose>
+                                                        <c:when test="${p.status == 1}"><span
+                                                                class="badge badge-active">Hiển thị</span></c:when>
+                                                        <c:otherwise><span class="badge badge-hidden">Ẩn</span>
+                                                        </c:otherwise>
+                                                    </c:choose>
+                                                </td>
+                                                <td>
+                                                    <a href="${pageContext.request.contextPath}/admin/product/edit?id=${p.id}"
                                                         class="action-link">Sửa</a>
                                                     |
-                                                    <a href="${pageContext.request.contextPath}/admin/category/delete?id=${cate.id}"
+                                                    <a href="${pageContext.request.contextPath}/admin/product/delete?id=${p.id}"
                                                         class="action-link del"
-                                                        onclick="return confirm('Xác nhận xóa: ${cate.name}?')">Xóa</a>
+                                                        onclick="return confirm('Xác nhận xóa sản phẩm: ${p.name}?')">Xóa</a>
                                                 </td>
                                             </tr>
                                         </c:forEach>
@@ -448,17 +465,13 @@
                 </div>
 
                 <script>
-                    // Tìm kiếm client-side đơn giản
                     function searchTable() {
                         const input = document.getElementById("searchInput").value.toLowerCase();
-                        const rows = document.querySelectorAll("#cateTable tbody tr");
-                        rows.forEach(row => {
-                            const text = row.textContent.toLowerCase();
-                            row.style.display = text.includes(input) ? "" : "none";
+                        document.querySelectorAll("#productTable tbody tr").forEach(row => {
+                            row.style.display = row.textContent.toLowerCase().includes(input) ? "" : "none";
                         });
                     }
                 </script>
-
             </body>
 
             </html>
